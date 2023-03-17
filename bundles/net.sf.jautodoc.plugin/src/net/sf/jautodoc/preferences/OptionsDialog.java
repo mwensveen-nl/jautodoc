@@ -10,7 +10,6 @@ package net.sf.jautodoc.preferences;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
-
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jface.dialogs.ControlEnableState;
 import org.eclipse.jface.dialogs.Dialog;
@@ -44,7 +43,6 @@ public class OptionsDialog extends Dialog {
     private Configuration config;
     private ICompilationUnit compUnit;
 
-
     /**
      * Instantiates a new options dialog.
      *
@@ -64,9 +62,12 @@ public class OptionsDialog extends Dialog {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
      */
+    @Override
     protected Control createDialogArea(Composite parent) {
         Composite basePanel = new Composite(parent, SWT.NONE);
         basePanel.setLayout(new GridLayout());
@@ -80,16 +81,18 @@ public class OptionsDialog extends Dialog {
         globalSettingsButton.setText("Use project/workspace settings");
         globalSettingsButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         globalSettingsButton.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 updateControlStates();
             }
 
+            @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 updateControlStates();
             }
         });
 
-        Label horizontalLine= new Label(upperPanel, SWT.SEPARATOR | SWT.HORIZONTAL);
+        Label horizontalLine = new Label(upperPanel, SWT.SEPARATOR | SWT.HORIZONTAL);
         horizontalLine.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         ob = new OptionsBlock();
@@ -116,9 +119,12 @@ public class OptionsDialog extends Dialog {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
      */
+    @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
         shell.setText(title);
@@ -149,6 +155,7 @@ public class OptionsDialog extends Dialog {
         ob.singleLineButton.setSelection(config.isSingleLineComment());
         ob.useFormatterButton.setSelection(config.isUseEclipseFormatter());
         ob.getSetFromFieldButton.setSelection(config.isGetterSetterFromField());
+        ob.allowMarkedEmptyButton.setSelection(config.isAllowMarkedEmpty());
 
         ob.getSetFromFieldFirstButton.setSelection(config.isGetterSetterFromFieldFirst());
         ob.getSetFromFieldReplaceButton.setSelection(config.isGetterSetterFromFieldReplace());
@@ -158,8 +165,8 @@ public class OptionsDialog extends Dialog {
         ob.multiHeaderButton.setSelection(config.isMultiCommentHeader());
         ob.usePackageInfoButton.setSelection(config.isUsePackageInfo());
 
-        ob.headerText      = config.getHeaderText();
-        ob.packageDocText  = config.getPackageDocText();
+        ob.headerText = config.getHeaderText();
+        ob.packageDocText = config.getPackageDocText();
         ob.packageInfoText = config.getPackageInfoText();
 
         ob.tagOrder = new ArrayList<String>(config.getTagOrder());
@@ -178,9 +185,12 @@ public class OptionsDialog extends Dialog {
         close();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.dialogs.Dialog#okPressed()
      */
+    @Override
     protected void okPressed() {
         applyConfig();
         super.okPressed();
@@ -190,8 +200,7 @@ public class OptionsDialog extends Dialog {
         if (globalSettingsButton.getSelection()) {
             // use global settings -> remove cached version
             ConfigurationManager.removeCachedConfiguration(compUnit);
-        }
-        else {
+        } else {
             config.setCompleteExistingJavadoc(ob.completeButton.getSelection());
             config.setKeepExistingJavadoc(ob.keepButton.getSelection());
             config.setReplaceExistingJavadoc(ob.replaceButton.getSelection());
@@ -214,6 +223,7 @@ public class OptionsDialog extends Dialog {
             config.setUseEclipseFormatter(ob.useFormatterButton.getSelection());
             config.setGetterSetterFromField(ob.getSetFromFieldButton.getSelection());
             config.setIncludeSubPackages(ob.includeSubPackagesButton.getSelection());
+            config.setAllowMarkedEmpty(ob.allowMarkedEmptyButton.getSelection());
 
             config.setGetterSetterFromFieldFirst(ob.getSetFromFieldFirstButton.getSelection());
             config.setGetterSetterFromFieldReplace(ob.getSetFromFieldReplaceButton.getSelection());

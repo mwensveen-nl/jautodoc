@@ -7,7 +7,6 @@
  *******************************************************************/
 package net.sf.jautodoc.preferences;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,7 +14,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
+import net.sf.jautodoc.JAutodocPlugin;
+import net.sf.jautodoc.preferences.replacements.ReplacementBlock;
+import net.sf.jautodoc.preferences.templates.TemplatePreferencePage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -49,11 +50,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
-import net.sf.jautodoc.JAutodocPlugin;
-import net.sf.jautodoc.preferences.replacements.ReplacementBlock;
-import net.sf.jautodoc.preferences.templates.TemplatePreferencePage;
-
-
 /**
  * Main preferences and project property page.
  */
@@ -71,37 +67,39 @@ public class MainPreferencePage extends PreferencePage implements
     private ControlEnableState enableState;
     private ControlEnableState btnEnableState;
 
-    private OptionsBlock     ob;
+    private OptionsBlock ob;
     private ReplacementBlock rb;
 
     private Composite buttonBar;
 
     private boolean enableScopeLink = true;
 
-    /** Hack for Eclipse 4.5 RC3 bug. */ 
+    /** Hack for Eclipse 4.5 RC3 bug. */
     private GridLayout contributeButtonsLayout;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void createControl(Composite parent){
+    public void createControl(Composite parent) {
         super.createControl(parent);
-        /* Hack for Eclipse 4.5 RC3 bug. numColumns is overridden after calling contributeButtons()*/
-        if (contributeButtonsLayout != null && contributeButtonsLayout.numColumns < 3) {
+        /* Hack for Eclipse 4.5 RC3 bug. numColumns is overridden after calling contributeButtons() */
+        if ((contributeButtonsLayout != null) && (contributeButtonsLayout.numColumns < 3)) {
             contributeButtonsLayout.numColumns += 3;
         }
         updateControls();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
      */
     @Override
     protected Control createContents(Composite parent) {
         basePanel = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout();
-        layout.marginWidth  = 0;
+        layout.marginWidth = 0;
         layout.marginHeight = 0;
         basePanel.setLayout(layout);
 
@@ -123,7 +121,9 @@ public class MainPreferencePage extends PreferencePage implements
         return basePanel;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.preference.PreferencePage#createDescriptionLabel(org.eclipse.swt.widgets.Composite)
      */
     @Override
@@ -132,8 +132,8 @@ public class MainPreferencePage extends PreferencePage implements
         composite.setFont(parent.getFont());
         GridLayout layout = new GridLayout();
         layout.marginHeight = 0;
-        layout.marginWidth  = 0;
-        layout.numColumns   = 2;
+        layout.marginWidth = 0;
+        layout.numColumns = 2;
         composite.setLayout(layout);
         composite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
@@ -156,7 +156,7 @@ public class MainPreferencePage extends PreferencePage implements
         createScopeLink(composite);
 
         if (isProjectPropertyPage()) {
-            Label horizontalLine= new Label(composite, SWT.SEPARATOR | SWT.HORIZONTAL);
+            Label horizontalLine = new Label(composite, SWT.SEPARATOR | SWT.HORIZONTAL);
             horizontalLine.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false, 2, 1));
             horizontalLine.setFont(composite.getFont());
         }
@@ -218,7 +218,7 @@ public class MainPreferencePage extends PreferencePage implements
 
         scopeLink = new Link(parent, SWT.NONE);
         scopeLink.setFont(parent.getFont());
-        scopeLink.setText("<A>" + text + "</A>");  //$NON-NLS-1$//$NON-NLS-2$
+        scopeLink.setText("<A>" + text + "</A>"); //$NON-NLS-1$//$NON-NLS-2$
         scopeLink.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -251,11 +251,12 @@ public class MainPreferencePage extends PreferencePage implements
                     projectsWithSpecifics.add(curr);
                 }
             }
-        } catch (JavaModelException e) {/* ignore */}
+        } catch (JavaModelException e) {
+            /* ignore */}
 
         ProjectSelectionDialog dialog = new ProjectSelectionDialog(getShell(), projectsWithSpecifics);
         if (dialog.open() == Window.OK) {
-            IJavaProject res = (IJavaProject)dialog.getFirstResult();
+            IJavaProject res = (IJavaProject) dialog.getFirstResult();
             openProjectProperties(res.getProject());
         }
     }
@@ -273,7 +274,9 @@ public class MainPreferencePage extends PreferencePage implements
      * specific settings is selected.
      */
     private void updateEnableStates() {
-        if (!isProjectPropertyPage()) return;
+        if (!isProjectPropertyPage()) {
+            return;
+        }
 
         if (projectSettingsButton.getSelection()) {
             if (enableState != null) {
@@ -296,8 +299,7 @@ public class MainPreferencePage extends PreferencePage implements
     private void updateScopeLinkState() {
         if (isProjectPropertyPage()) {
             scopeLink.setEnabled(isEnableScopeLink() && !projectSettingsButton.getSelection());
-        }
-        else {
+        } else {
             scopeLink.setEnabled(isEnableScopeLink());
         }
     }
@@ -309,7 +311,7 @@ public class MainPreferencePage extends PreferencePage implements
      * @return true, if project has specific settings
      */
     private boolean hasProjectSpecificSettings(IProject aProject) {
-        return aProject != null
+        return (aProject != null)
                 && ConfigurationManager.getPreferenceStore(aProject)
                         .getBoolean(PROJECT_SPECIFIC);
     }
@@ -370,8 +372,7 @@ public class MainPreferencePage extends PreferencePage implements
         if (isProjectPropertyPage() && hasProjectSpecificSettings(project)) {
             projectSettingsButton.setSelection(true);
             prefStore = ConfigurationManager.getPreferenceStore(project);
-        }
-        else {
+        } else {
             projectSettingsButton.setSelection(false);
             prefStore = ConfigurationManager.getPreferenceStore();
         }
@@ -379,11 +380,9 @@ public class MainPreferencePage extends PreferencePage implements
         String mode = prefStore.getString(MODE);
         if (MODE_COMPLETE.equals(mode)) {
             ob.completeButton.setSelection(true);
-        }
-        else if (MODE_KEEP.equals(mode)) {
+        } else if (MODE_KEEP.equals(mode)) {
             ob.keepButton.setSelection(true);
-        }
-        else if (MODE_REPLACE.equals(mode)) {
+        } else if (MODE_REPLACE.equals(mode)) {
             ob.replaceButton.setSelection(true);
         }
 
@@ -405,6 +404,7 @@ public class MainPreferencePage extends PreferencePage implements
         ob.useFormatterButton.setSelection(prefStore.getBoolean(USE_FORMATTER));
         ob.getSetFromFieldButton.setSelection(prefStore.getBoolean(GET_SET_FROM_FIELD));
         ob.includeSubPackagesButton.setSelection(prefStore.getBoolean(INCLUDE_SUBPACKAGES));
+        ob.allowMarkedEmptyButton.setSelection(prefStore.getBoolean(ALLOW_MARKED_EMPTY));
 
         ob.getSetFromFieldFirstButton.setSelection(prefStore.getBoolean(GET_SET_FROM_FIELD_FIRST));
         ob.getSetFromFieldReplaceButton.setSelection(prefStore.getBoolean(GET_SET_FROM_FIELD_REPLACE));
@@ -414,8 +414,8 @@ public class MainPreferencePage extends PreferencePage implements
         ob.multiHeaderButton.setSelection(prefStore.getBoolean(MULTI_HEADER));
         ob.usePackageInfoButton.setSelection(prefStore.getBoolean(USE_PKG_INFO));
 
-        ob.headerText      = prefStore.getString(HEADER_TEXT);
-        ob.packageDocText  = prefStore.getString(PKG_DOC_TEXT);
+        ob.headerText = prefStore.getString(HEADER_TEXT);
+        ob.packageDocText = prefStore.getString(PKG_DOC_TEXT);
         ob.packageInfoText = prefStore.getString(PKG_INFO_TEXT);
 
         ob.tagOrder = new ArrayList<String>(prefStore.getTagOrder());
@@ -452,11 +452,11 @@ public class MainPreferencePage extends PreferencePage implements
     private void refreshTemplatePreferencePage() {
         if (preferenceManager != null) {
             final IPreferenceNode pn = preferenceManager.find(TemplatePreferencePage.PATH);
-            if (pn != null && pn.getPage() == null) {
+            if ((pn != null) && (pn.getPage() == null)) {
                 pn.createPage();
             }
 
-            final TemplatePreferencePage tpp = (TemplatePreferencePage)pn.getPage();
+            final TemplatePreferencePage tpp = (TemplatePreferencePage) pn.getPage();
             if (tpp != null) {
                 tpp.setProperties(ob.properties);
                 tpp.refresh();
@@ -482,7 +482,9 @@ public class MainPreferencePage extends PreferencePage implements
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
      */
     @Override
@@ -491,7 +493,7 @@ public class MainPreferencePage extends PreferencePage implements
             return;
         }
 
-        PreferenceStore prefStore = (PreferenceStore)getPreferenceStore();
+        PreferenceStore prefStore = (PreferenceStore) getPreferenceStore();
 
         // mode
         String mode = prefStore.getDefaultString(MODE);
@@ -499,13 +501,11 @@ public class MainPreferencePage extends PreferencePage implements
             ob.completeButton.setSelection(true);
             ob.keepButton.setSelection(false);
             ob.replaceButton.setSelection(false);
-        }
-        else if (MODE_KEEP.equals(mode)) {
+        } else if (MODE_KEEP.equals(mode)) {
             ob.completeButton.setSelection(false);
             ob.keepButton.setSelection(true);
             ob.replaceButton.setSelection(false);
-        }
-        else if (MODE_REPLACE.equals(mode)) {
+        } else if (MODE_REPLACE.equals(mode)) {
             ob.completeButton.setSelection(false);
             ob.keepButton.setSelection(false);
             ob.replaceButton.setSelection(true);
@@ -532,6 +532,7 @@ public class MainPreferencePage extends PreferencePage implements
         ob.useFormatterButton.setSelection(prefStore.getDefaultBoolean(USE_FORMATTER));
         ob.getSetFromFieldButton.setSelection(prefStore.getDefaultBoolean(GET_SET_FROM_FIELD));
         ob.includeSubPackagesButton.setSelection(prefStore.getDefaultBoolean(INCLUDE_SUBPACKAGES));
+        ob.allowMarkedEmptyButton.setSelection(prefStore.getDefaultBoolean(ALLOW_MARKED_EMPTY));
 
         ob.getSetFromFieldFirstButton.setSelection(prefStore.getDefaultBoolean(GET_SET_FROM_FIELD_FIRST));
         ob.getSetFromFieldReplaceButton.setSelection(prefStore.getDefaultBoolean(GET_SET_FROM_FIELD_REPLACE));
@@ -560,12 +561,14 @@ public class MainPreferencePage extends PreferencePage implements
         super.performDefaults();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.preference.PreferencePage#performOk()
      */
     @Override
     public boolean performOk() {
-        PreferenceStore prefStore = (PreferenceStore)getPreferenceStore();
+        PreferenceStore prefStore = (PreferenceStore) getPreferenceStore();
 
         if (isProjectPropertyPage()) {
             prefStore.setValue(PROJECT_SPECIFIC, projectSettingsButton.getSelection());
@@ -576,43 +579,42 @@ public class MainPreferencePage extends PreferencePage implements
 
         if (ob.completeButton.getSelection()) {
             prefStore.setValue(MODE, MODE_COMPLETE);
-        }
-        else if (ob.keepButton.getSelection()) {
+        } else if (ob.keepButton.getSelection()) {
             prefStore.setValue(MODE, MODE_KEEP);
-        }
-        else if (ob.replaceButton.getSelection()) {
+        } else if (ob.replaceButton.getSelection()) {
             prefStore.setValue(MODE, MODE_REPLACE);
         }
 
-        prefStore.setValue(VISIBILITY_PUBLIC,    ob.publicButton.getSelection());
+        prefStore.setValue(VISIBILITY_PUBLIC, ob.publicButton.getSelection());
         prefStore.setValue(VISIBILITY_PROTECTED, ob.protectedButton.getSelection());
-        prefStore.setValue(VISIBILITY_PACKAGE,   ob.packageButton.getSelection());
-        prefStore.setValue(VISIBILITY_PRIVATE,   ob.privateButton.getSelection());
+        prefStore.setValue(VISIBILITY_PACKAGE, ob.packageButton.getSelection());
+        prefStore.setValue(VISIBILITY_PRIVATE, ob.privateButton.getSelection());
 
-        prefStore.setValue(FILTER_TYPES,         ob.filterTypesButton.getSelection());
-        prefStore.setValue(FILTER_FIELDS,        ob.filterFieldsButton.getSelection());
-        prefStore.setValue(FILTER_METHODS,       ob.filterMethodsButton.getSelection());
-        prefStore.setValue(FILTER_GETSET,        ob.filterGetterSetterButton.getSelection());
-        prefStore.setValue(FILTER_EXCLGETSET,    ob.filterExcludeGetterSetterButton.getSelection());
-        prefStore.setValue(FILTER_EXCLOVERRID,   ob.filterExcludeOverridingButton.getSelection());
+        prefStore.setValue(FILTER_TYPES, ob.filterTypesButton.getSelection());
+        prefStore.setValue(FILTER_FIELDS, ob.filterFieldsButton.getSelection());
+        prefStore.setValue(FILTER_METHODS, ob.filterMethodsButton.getSelection());
+        prefStore.setValue(FILTER_GETSET, ob.filterGetterSetterButton.getSelection());
+        prefStore.setValue(FILTER_EXCLGETSET, ob.filterExcludeGetterSetterButton.getSelection());
+        prefStore.setValue(FILTER_EXCLOVERRID, ob.filterExcludeOverridingButton.getSelection());
 
-        prefStore.setValue(ADD_TODO,             ob.todoButton.getSelection());
-        prefStore.setValue(CREATE_DUMMY_DOC,     ob.dummyDocButton.getSelection());
-        prefStore.setValue(SINGLE_LINE,          ob.singleLineButton.getSelection());
-        prefStore.setValue(USE_FORMATTER,        ob.useFormatterButton.getSelection());
-        prefStore.setValue(GET_SET_FROM_FIELD,   ob.getSetFromFieldButton.getSelection());
-        prefStore.setValue(INCLUDE_SUBPACKAGES,  ob.includeSubPackagesButton.getSelection());
+        prefStore.setValue(ADD_TODO, ob.todoButton.getSelection());
+        prefStore.setValue(CREATE_DUMMY_DOC, ob.dummyDocButton.getSelection());
+        prefStore.setValue(SINGLE_LINE, ob.singleLineButton.getSelection());
+        prefStore.setValue(USE_FORMATTER, ob.useFormatterButton.getSelection());
+        prefStore.setValue(GET_SET_FROM_FIELD, ob.getSetFromFieldButton.getSelection());
+        prefStore.setValue(INCLUDE_SUBPACKAGES, ob.includeSubPackagesButton.getSelection());
+        prefStore.setValue(ALLOW_MARKED_EMPTY, ob.allowMarkedEmptyButton.getSelection());
 
-        prefStore.setValue(GET_SET_FROM_FIELD_FIRST,   ob.getSetFromFieldFirstButton.getSelection());
+        prefStore.setValue(GET_SET_FROM_FIELD_FIRST, ob.getSetFromFieldFirstButton.getSelection());
         prefStore.setValue(GET_SET_FROM_FIELD_REPLACE, ob.getSetFromFieldReplaceButton.getSelection());
 
-        prefStore.setValue(ADD_HEADER,           ob.addHeaderButton.getSelection());
-        prefStore.setValue(REPLACE_HEADER,       ob.replaceHeaderButton.getSelection());
-        prefStore.setValue(MULTI_HEADER,         ob.multiHeaderButton.getSelection());
-        prefStore.setValue(USE_PKG_INFO,         ob.usePackageInfoButton.getSelection());
-        prefStore.setValue(HEADER_TEXT,          ob.headerText);
-        prefStore.setValue(PKG_DOC_TEXT,         ob.packageDocText);
-        prefStore.setValue(PKG_INFO_TEXT,        ob.packageInfoText);
+        prefStore.setValue(ADD_HEADER, ob.addHeaderButton.getSelection());
+        prefStore.setValue(REPLACE_HEADER, ob.replaceHeaderButton.getSelection());
+        prefStore.setValue(MULTI_HEADER, ob.multiHeaderButton.getSelection());
+        prefStore.setValue(USE_PKG_INFO, ob.usePackageInfoButton.getSelection());
+        prefStore.setValue(HEADER_TEXT, ob.headerText);
+        prefStore.setValue(PKG_DOC_TEXT, ob.packageDocText);
+        prefStore.setValue(PKG_INFO_TEXT, ob.packageInfoText);
 
         prefStore.setTagOrder(ob.tagOrder);
         prefStore.setProperties(ob.properties);
@@ -623,7 +625,9 @@ public class MainPreferencePage extends PreferencePage implements
         return super.performOk();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
      */
     @Override
@@ -631,7 +635,9 @@ public class MainPreferencePage extends PreferencePage implements
         preferenceManager = workbench.getPreferenceManager();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.preference.PreferencePage#getPreferenceStore()
      */
     @Override
@@ -643,13 +649,15 @@ public class MainPreferencePage extends PreferencePage implements
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.preference.PreferencePage#applyData(java.lang.Object)
      */
     @Override
     public void applyData(Object data) {
         if (data instanceof Boolean) {
-            setEnableScopeLink(((Boolean)data).booleanValue());
+            setEnableScopeLink(((Boolean) data).booleanValue());
         }
         updateScopeLinkState();
     }
@@ -658,7 +666,9 @@ public class MainPreferencePage extends PreferencePage implements
     // IWorkbenchPropertyPage
     // ----------------------------------------------------
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.ui.IWorkbenchPropertyPage#getElement()
      */
     @Override
@@ -666,11 +676,13 @@ public class MainPreferencePage extends PreferencePage implements
         return project;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.ui.IWorkbenchPropertyPage#setElement(org.eclipse.core.runtime.IAdaptable)
      */
     @Override
     public void setElement(IAdaptable element) {
-        project = (IProject)element.getAdapter(IResource.class);
+        project = (IProject) element.getAdapter(IResource.class);
     }
 }

@@ -16,14 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
-
 import net.sf.jautodoc.preferences.replacements.Replacement;
 import net.sf.jautodoc.preferences.replacements.ReplacementManager;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
@@ -34,7 +31,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-
 
 /**
  * Contains a Workspace or Project specific configuration.
@@ -52,41 +48,42 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
     private boolean readonly = true;
 
     private boolean completeExistingJavadoc = true;
-    private boolean keepExistingJavadoc     = false;
-    private boolean replaceExistingJavadoc  = false;
+    private boolean keepExistingJavadoc = false;
+    private boolean replaceExistingJavadoc = false;
 
-    private boolean includePublic    = true;
+    private boolean includePublic = true;
     private boolean includeProtected = true;
-    private boolean includePackage   = true;
-    private boolean includePrivate   = true;
+    private boolean includePackage = true;
+    private boolean includePrivate = true;
 
-    private boolean includeTypes        = true;
-    private boolean includeFields       = true;
-    private boolean includeMethods      = true;
-    private boolean getterSetterOnly    = true;
+    private boolean includeTypes = true;
+    private boolean includeFields = true;
+    private boolean includeMethods = true;
+    private boolean getterSetterOnly = true;
     private boolean excludeGetterSetter = true;
-    private boolean excludeOverriding   = false;
+    private boolean excludeOverriding = false;
 
-    private boolean addTodoForAutodoc     = true;
-    private boolean createDummyComment    = true;
-    private boolean singleLineComment     = true;
-    private boolean useEclipseFormatter   = false;
+    private boolean addTodoForAutodoc = true;
+    private boolean createDummyComment = true;
+    private boolean singleLineComment = true;
+    private boolean useEclipseFormatter = false;
     private boolean getterSetterFromField = false;
-    private boolean includeSubPackages    = false;
+    private boolean includeSubPackages = false;
+    private boolean allowMarkedEmpty = false;
 
-    private boolean getterSetterFromFieldFirst   = true;
+    private boolean getterSetterFromFieldFirst = true;
     private boolean getterSetterFromFieldReplace = false;
 
-    private boolean addHeader          = false;
-    private boolean replaceHeader      = false;
+    private boolean addHeader = false;
+    private boolean replaceHeader = false;
     private boolean multiCommentHeader = false;
-    private boolean usePackageInfo     = false;
+    private boolean usePackageInfo = false;
 
     @XmlTransient
-    private String headerText      = "";
+    private String headerText = "";
 
     @XmlTransient
-    private String packageDocText  = "";
+    private String packageDocText = "";
 
     @XmlTransient
     private String packageInfoText = "";
@@ -102,7 +99,6 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
 
     @XmlTransient
     private ReplacementManager replacementManager;
-
 
     /**
      * Instantiates a new configuration. Required for JAXB.
@@ -145,37 +141,38 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
         this.readonly = false;
 
         this.completeExistingJavadoc = c.completeExistingJavadoc;
-        this.keepExistingJavadoc     = c.keepExistingJavadoc;
-        this.replaceExistingJavadoc  = c.replaceExistingJavadoc;
+        this.keepExistingJavadoc = c.keepExistingJavadoc;
+        this.replaceExistingJavadoc = c.replaceExistingJavadoc;
 
-        this.includePublic    = c.includePublic;
+        this.includePublic = c.includePublic;
         this.includeProtected = c.includeProtected;
-        this.includePackage   = c.includePackage;
-        this.includePrivate   = c.includePrivate;
+        this.includePackage = c.includePackage;
+        this.includePrivate = c.includePrivate;
 
-        this.includeTypes        = c.includeTypes;
-        this.includeFields       = c.includeFields;
-        this.includeMethods      = c.includeMethods;
-        this.getterSetterOnly    = c.getterSetterOnly;
+        this.includeTypes = c.includeTypes;
+        this.includeFields = c.includeFields;
+        this.includeMethods = c.includeMethods;
+        this.getterSetterOnly = c.getterSetterOnly;
         this.excludeGetterSetter = c.excludeGetterSetter;
-        this.excludeOverriding   = c.excludeOverriding;
+        this.excludeOverriding = c.excludeOverriding;
 
-        this.addTodoForAutodoc     = c.addTodoForAutodoc;
-        this.createDummyComment    = c.createDummyComment;
-        this.singleLineComment     = c.singleLineComment;
-        this.useEclipseFormatter   = c.useEclipseFormatter;
+        this.addTodoForAutodoc = c.addTodoForAutodoc;
+        this.createDummyComment = c.createDummyComment;
+        this.singleLineComment = c.singleLineComment;
+        this.useEclipseFormatter = c.useEclipseFormatter;
         this.getterSetterFromField = c.getterSetterFromField;
-        this.includeSubPackages    = c.includeSubPackages;
+        this.includeSubPackages = c.includeSubPackages;
+        this.allowMarkedEmpty = c.allowMarkedEmpty;
 
-        this.getterSetterFromFieldFirst   = c.getterSetterFromFieldFirst;
+        this.getterSetterFromFieldFirst = c.getterSetterFromFieldFirst;
         this.getterSetterFromFieldReplace = c.getterSetterFromFieldReplace;
 
-        this.addHeader          = c.addHeader;
-        this.replaceHeader      = c.replaceHeader;
+        this.addHeader = c.addHeader;
+        this.replaceHeader = c.replaceHeader;
         this.multiCommentHeader = c.multiCommentHeader;
 
-        this.headerText      = new String(c.headerText);
-        this.packageDocText  = new String(c.packageDocText);
+        this.headerText = new String(c.headerText);
+        this.packageDocText = new String(c.packageDocText);
         this.packageInfoText = new String(c.packageInfoText);
 
         this.tagOrder.addAll(c.tagOrder);
@@ -212,6 +209,7 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
         this.addTodoForAutodoc = addTodoForAutodoc;
     }
 
+    @Override
     public boolean isIncludeFields() {
         return includeFields;
     }
@@ -221,6 +219,7 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
         this.includeFields = commentFields;
     }
 
+    @Override
     public boolean isIncludeMethods() {
         return includeMethods;
     }
@@ -230,6 +229,7 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
         this.includeMethods = commentMethods;
     }
 
+    @Override
     public boolean isIncludeTypes() {
         return includeTypes;
     }
@@ -257,6 +257,7 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
         this.createDummyComment = createDummyComment;
     }
 
+    @Override
     public boolean isGetterSetterOnly() {
         return getterSetterOnly;
     }
@@ -266,6 +267,7 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
         this.getterSetterOnly = getterSetterOnly;
     }
 
+    @Override
     public boolean isExcludeGetterSetter() {
         return excludeGetterSetter;
     }
@@ -275,6 +277,7 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
         this.excludeGetterSetter = excludeGetterSetter;
     }
 
+    @Override
     public boolean isExcludeOverriding() {
         return excludeOverriding;
     }
@@ -383,6 +386,16 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
         this.includeSubPackages = includeSubPackages;
     }
 
+    public boolean isAllowMarkedEmpty() {
+        return allowMarkedEmpty;
+    }
+
+    public void setAllowMarkedEmpty(boolean allowMarkedEmpty) {
+        checkReadonly();
+        this.allowMarkedEmpty = allowMarkedEmpty;
+    }
+
+    @Override
     public boolean isIncludePackage() {
         return includePackage;
     }
@@ -392,6 +405,7 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
         this.includePackage = visibilityPackage;
     }
 
+    @Override
     public boolean isIncludePrivate() {
         return includePrivate;
     }
@@ -401,6 +415,7 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
         this.includePrivate = visibilityPrivate;
     }
 
+    @Override
     public boolean isIncludeProtected() {
         return includeProtected;
     }
@@ -410,6 +425,7 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
         this.includeProtected = visibilityProtected;
     }
 
+    @Override
     public boolean isIncludePublic() {
         return includePublic;
     }
@@ -496,34 +512,35 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
         properties.putAll(prefStore.getProperties());
         getSetFromFieldReplacements.addAll(prefStore.getGetSetFromFieldReplacements());
 
-        includePublic    = prefStore.getBoolean(VISIBILITY_PUBLIC);
+        includePublic = prefStore.getBoolean(VISIBILITY_PUBLIC);
         includeProtected = prefStore.getBoolean(VISIBILITY_PROTECTED);
-        includePackage   = prefStore.getBoolean(VISIBILITY_PACKAGE);
-        includePrivate   = prefStore.getBoolean(VISIBILITY_PRIVATE);
+        includePackage = prefStore.getBoolean(VISIBILITY_PACKAGE);
+        includePrivate = prefStore.getBoolean(VISIBILITY_PRIVATE);
 
-        includeTypes        = prefStore.getBoolean(FILTER_TYPES);
-        includeFields       = prefStore.getBoolean(FILTER_FIELDS);
-        includeMethods      = prefStore.getBoolean(FILTER_METHODS);
-        getterSetterOnly    = prefStore.getBoolean(FILTER_GETSET);
+        includeTypes = prefStore.getBoolean(FILTER_TYPES);
+        includeFields = prefStore.getBoolean(FILTER_FIELDS);
+        includeMethods = prefStore.getBoolean(FILTER_METHODS);
+        getterSetterOnly = prefStore.getBoolean(FILTER_GETSET);
         excludeGetterSetter = prefStore.getBoolean(FILTER_EXCLGETSET);
-        excludeOverriding   = prefStore.getBoolean(FILTER_EXCLOVERRID);
+        excludeOverriding = prefStore.getBoolean(FILTER_EXCLOVERRID);
 
-        addTodoForAutodoc     = prefStore.getBoolean(ADD_TODO);
-        createDummyComment    = prefStore.getBoolean(CREATE_DUMMY_DOC);
-        singleLineComment     = prefStore.getBoolean(SINGLE_LINE);
-        useEclipseFormatter   = prefStore.getBoolean(USE_FORMATTER);
+        addTodoForAutodoc = prefStore.getBoolean(ADD_TODO);
+        createDummyComment = prefStore.getBoolean(CREATE_DUMMY_DOC);
+        singleLineComment = prefStore.getBoolean(SINGLE_LINE);
+        useEclipseFormatter = prefStore.getBoolean(USE_FORMATTER);
         getterSetterFromField = prefStore.getBoolean(GET_SET_FROM_FIELD);
-        includeSubPackages    = prefStore.getBoolean(INCLUDE_SUBPACKAGES);
-        addHeader             = prefStore.getBoolean(ADD_HEADER);
-        replaceHeader         = prefStore.getBoolean(REPLACE_HEADER);
-        multiCommentHeader    = prefStore.getBoolean(MULTI_HEADER);
-        usePackageInfo        = prefStore.getBoolean(USE_PKG_INFO);
+        includeSubPackages = prefStore.getBoolean(INCLUDE_SUBPACKAGES);
+        allowMarkedEmpty = prefStore.getBoolean(ALLOW_MARKED_EMPTY);
+        addHeader = prefStore.getBoolean(ADD_HEADER);
+        replaceHeader = prefStore.getBoolean(REPLACE_HEADER);
+        multiCommentHeader = prefStore.getBoolean(MULTI_HEADER);
+        usePackageInfo = prefStore.getBoolean(USE_PKG_INFO);
 
-        getterSetterFromFieldFirst   = prefStore.getBoolean(GET_SET_FROM_FIELD_FIRST);
+        getterSetterFromFieldFirst = prefStore.getBoolean(GET_SET_FROM_FIELD_FIRST);
         getterSetterFromFieldReplace = prefStore.getBoolean(GET_SET_FROM_FIELD_REPLACE);
 
-        headerText      = prefStore.getString(HEADER_TEXT);
-        packageDocText  = prefStore.getString(PKG_DOC_TEXT);
+        headerText = prefStore.getString(HEADER_TEXT);
+        packageDocText = prefStore.getString(PKG_DOC_TEXT);
         packageInfoText = prefStore.getString(PKG_INFO_TEXT);
 
         prefStore.addPropertyChangeListener(this);
@@ -540,116 +557,90 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
         String mode = prefStore.getString(MODE);
         if (MODE_COMPLETE.equals(mode)) {
             completeExistingJavadoc = true;
-            keepExistingJavadoc     = false;
-            replaceExistingJavadoc  = false;
-        }
-        else if (MODE_KEEP.equals(mode)) {
+            keepExistingJavadoc = false;
+            replaceExistingJavadoc = false;
+        } else if (MODE_KEEP.equals(mode)) {
             completeExistingJavadoc = false;
-            keepExistingJavadoc     = true;
-            replaceExistingJavadoc  = false;
-        }
-        else if (MODE_REPLACE.equals(mode)) {
+            keepExistingJavadoc = true;
+            replaceExistingJavadoc = false;
+        } else if (MODE_REPLACE.equals(mode)) {
             completeExistingJavadoc = false;
-            keepExistingJavadoc     = false;
-            replaceExistingJavadoc  = true;
+            keepExistingJavadoc = false;
+            replaceExistingJavadoc = true;
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
      */
+    @Override
     public void propertyChange(PropertyChangeEvent event) {
         if (event.getProperty().startsWith(REPLACEMENTS)) {
             initReplacements();
-        }
-        else if (MODE.equals(event.getProperty())) {
+        } else if (MODE.equals(event.getProperty())) {
             initMode();
-        }
-        else if (TAG_ORDER.equals(event.getProperty())) {
+        } else if (TAG_ORDER.equals(event.getProperty())) {
             tagOrder.clear();
             tagOrder.addAll(prefStore.getTagOrder());
-        }
-        else if (event.getProperty().startsWith(PROPERTIES)) {
+        } else if (event.getProperty().startsWith(PROPERTIES)) {
             properties.clear();
             properties.putAll(prefStore.getProperties());
-        }
-        else if (GET_SET_FROM_FIELD_REPLACEMENTS.equals(event.getProperty())) {
+        } else if (GET_SET_FROM_FIELD_REPLACEMENTS.equals(event.getProperty())) {
             getSetFromFieldReplacements.clear();
             getSetFromFieldReplacements.addAll(prefStore.getGetSetFromFieldReplacements());
-        }
-        else if (VISIBILITY_PUBLIC.equals(event.getProperty())) {
+        } else if (VISIBILITY_PUBLIC.equals(event.getProperty())) {
             includePublic = prefStore.getBoolean(VISIBILITY_PUBLIC);
-        }
-        else if (VISIBILITY_PROTECTED.equals(event.getProperty())) {
+        } else if (VISIBILITY_PROTECTED.equals(event.getProperty())) {
             includeProtected = prefStore.getBoolean(VISIBILITY_PROTECTED);
-        }
-        else if (VISIBILITY_PACKAGE.equals(event.getProperty())) {
+        } else if (VISIBILITY_PACKAGE.equals(event.getProperty())) {
             includePackage = prefStore.getBoolean(VISIBILITY_PACKAGE);
-        }
-        else if (VISIBILITY_PRIVATE.equals(event.getProperty())) {
+        } else if (VISIBILITY_PRIVATE.equals(event.getProperty())) {
             includePrivate = prefStore.getBoolean(VISIBILITY_PRIVATE);
-        }
-        else if (FILTER_TYPES.equals(event.getProperty())) {
+        } else if (FILTER_TYPES.equals(event.getProperty())) {
             includeTypes = prefStore.getBoolean(FILTER_TYPES);
-        }
-        else if (FILTER_FIELDS.equals(event.getProperty())) {
+        } else if (FILTER_FIELDS.equals(event.getProperty())) {
             includeFields = prefStore.getBoolean(FILTER_FIELDS);
-        }
-        else if (FILTER_METHODS.equals(event.getProperty())) {
+        } else if (FILTER_METHODS.equals(event.getProperty())) {
             includeMethods = prefStore.getBoolean(FILTER_METHODS);
-        }
-        else if (FILTER_GETSET.equals(event.getProperty())) {
+        } else if (FILTER_GETSET.equals(event.getProperty())) {
             getterSetterOnly = prefStore.getBoolean(FILTER_GETSET);
-        }
-        else if (FILTER_EXCLGETSET.equals(event.getProperty())) {
+        } else if (FILTER_EXCLGETSET.equals(event.getProperty())) {
             excludeGetterSetter = prefStore.getBoolean(FILTER_EXCLGETSET);
-        }
-        else if (FILTER_EXCLOVERRID.equals(event.getProperty())) {
+        } else if (FILTER_EXCLOVERRID.equals(event.getProperty())) {
             excludeOverriding = prefStore.getBoolean(FILTER_EXCLOVERRID);
-        }
-        else if (ADD_TODO.equals(event.getProperty())) {
-            addTodoForAutodoc  = prefStore.getBoolean(ADD_TODO);
-        }
-        else if (CREATE_DUMMY_DOC.equals(event.getProperty())) {
+        } else if (ADD_TODO.equals(event.getProperty())) {
+            addTodoForAutodoc = prefStore.getBoolean(ADD_TODO);
+        } else if (CREATE_DUMMY_DOC.equals(event.getProperty())) {
             createDummyComment = prefStore.getBoolean(CREATE_DUMMY_DOC);
-        }
-        else if (SINGLE_LINE.equals(event.getProperty())) {
+        } else if (SINGLE_LINE.equals(event.getProperty())) {
             singleLineComment = prefStore.getBoolean(SINGLE_LINE);
-        }
-        else if (USE_FORMATTER.equals(event.getProperty())) {
+        } else if (USE_FORMATTER.equals(event.getProperty())) {
             useEclipseFormatter = prefStore.getBoolean(USE_FORMATTER);
-        }
-        else if (GET_SET_FROM_FIELD.equals(event.getProperty())) {
+        } else if (GET_SET_FROM_FIELD.equals(event.getProperty())) {
             getterSetterFromField = prefStore.getBoolean(GET_SET_FROM_FIELD);
-        }
-        else if (GET_SET_FROM_FIELD_FIRST.equals(event.getProperty())) {
+        } else if (GET_SET_FROM_FIELD_FIRST.equals(event.getProperty())) {
             getterSetterFromFieldFirst = prefStore.getBoolean(GET_SET_FROM_FIELD_FIRST);
-        }
-        else if (GET_SET_FROM_FIELD_REPLACE.equals(event.getProperty())) {
+        } else if (GET_SET_FROM_FIELD_REPLACE.equals(event.getProperty())) {
             getterSetterFromFieldReplace = prefStore.getBoolean(GET_SET_FROM_FIELD_REPLACE);
-        }
-        else if (INCLUDE_SUBPACKAGES.equals(event.getProperty())) {
+        } else if (INCLUDE_SUBPACKAGES.equals(event.getProperty())) {
             includeSubPackages = prefStore.getBoolean(INCLUDE_SUBPACKAGES);
-        }
-        else if (ADD_HEADER.equals(event.getProperty())) {
+        } else if (ALLOW_MARKED_EMPTY.equals(event.getProperty())) {
+            allowMarkedEmpty = prefStore.getBoolean(ALLOW_MARKED_EMPTY);
+        } else if (ADD_HEADER.equals(event.getProperty())) {
             addHeader = prefStore.getBoolean(ADD_HEADER);
-        }
-        else if (REPLACE_HEADER.equals(event.getProperty())) {
+        } else if (REPLACE_HEADER.equals(event.getProperty())) {
             replaceHeader = prefStore.getBoolean(REPLACE_HEADER);
-        }
-        else if (MULTI_HEADER.equals(event.getProperty())) {
+        } else if (MULTI_HEADER.equals(event.getProperty())) {
             multiCommentHeader = prefStore.getBoolean(MULTI_HEADER);
-        }
-        else if (USE_PKG_INFO.equals(event.getProperty())) {
+        } else if (USE_PKG_INFO.equals(event.getProperty())) {
             usePackageInfo = prefStore.getBoolean(USE_PKG_INFO);
-        }
-        else if (HEADER_TEXT.equals(event.getProperty())) {
+        } else if (HEADER_TEXT.equals(event.getProperty())) {
             headerText = prefStore.getString(HEADER_TEXT);
-        }
-        else if (PKG_DOC_TEXT.equals(event.getProperty())) {
+        } else if (PKG_DOC_TEXT.equals(event.getProperty())) {
             packageDocText = prefStore.getString(PKG_DOC_TEXT);
-        }
-        else if (PKG_INFO_TEXT.equals(event.getProperty())) {
+        } else if (PKG_INFO_TEXT.equals(event.getProperty())) {
             packageInfoText = prefStore.getString(PKG_INFO_TEXT);
         }
     }
@@ -684,7 +675,7 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
         getDefaultFieldPrefixes(javaProject, prefixes, JavaCore.CODEASSIST_FIELD_PREFIXES);
         getDefaultFieldPrefixes(javaProject, prefixes, JavaCore.CODEASSIST_STATIC_FIELD_PREFIXES);
         // not supported in 3.4
-        //getDefaultFieldPrefixes(javaProject, prefixes, JavaCore.CODEASSIST_STATIC_FINAL_FIELD_PREFIXES);
+        // getDefaultFieldPrefixes(javaProject, prefixes, JavaCore.CODEASSIST_STATIC_FINAL_FIELD_PREFIXES);
         getDefaultFieldPrefixes(javaProject, prefixes, JavaCore.CODEASSIST_ARGUMENT_PREFIXES);
         return prefixes;
     }
@@ -694,7 +685,7 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
 
         final String sPrefixes = (javaProject == null) ? JavaCore.getOption(optionName)
                 : javaProject.getOption(optionName, true);
-        if (sPrefixes != null && sPrefixes.length() > 0) {
+        if ((sPrefixes != null) && (sPrefixes.length() > 0)) {
             prefixes.addAll(Arrays.asList(sPrefixes.split(",")));
         }
     }
@@ -702,13 +693,15 @@ public class Configuration implements IMemberFilter, IPropertyChangeListener, Co
     private void initGlobalPreferenceChangeListener() {
         getScopeContext().getNode(JavaCore.PLUGIN_ID).addPreferenceChangeListener(new IPreferenceChangeListener() {
 
+            @Override
             public void preferenceChange(PreferenceChangeEvent event) {
                 if (event.getKey().equals(JavaCore.CODEASSIST_FIELD_PREFIXES)
                         || event.getKey().equals(JavaCore.CODEASSIST_STATIC_FIELD_PREFIXES)
-                        // not supported in 3.4
-                        //|| event.getKey().equals(JavaCore.CODEASSIST_STATIC_FINAL_FIELD_PREFIXES)
-                        || event.getKey().equals(JavaCore.CODEASSIST_ARGUMENT_PREFIXES))
+                // not supported in 3.4
+                // || event.getKey().equals(JavaCore.CODEASSIST_STATIC_FINAL_FIELD_PREFIXES)
+                        || event.getKey().equals(JavaCore.CODEASSIST_ARGUMENT_PREFIXES)) {
                     initReplacements();
+                }
             }
         });
     }

@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
-
 import net.sf.jautodoc.JAutodocPlugin;
 import net.sf.jautodoc.preferences.replacements.Replacement;
 import net.sf.jautodoc.preferences.replacements.ReplacementBlock;
@@ -24,7 +23,8 @@ import net.sf.jautodoc.utils.StringUtils;
  */
 public final class PreferenceSerializer {
 
-    private PreferenceSerializer() {/* no instantiation */}
+    private PreferenceSerializer() {
+        /* no instantiation */}
 
     public static void doImport(final OptionsBlock ob, final ReplacementBlock rb,
             final List<PreferenceType> selectedPreferenceTypes, final String fileName) throws Exception {
@@ -63,6 +63,7 @@ public final class PreferenceSerializer {
             configuration.setGetterSetterOnly(ob.filterGetterSetterButton.getSelection());
             configuration.setExcludeGetterSetter(ob.filterExcludeGetterSetterButton.getSelection());
             configuration.setExcludeOverriding(ob.filterExcludeOverridingButton.getSelection());
+            configuration.setAllowMarkedEmpty(ob.allowMarkedEmptyButton.getSelection());
 
             configuration.setAddTodoForAutodoc(ob.todoButton.getSelection());
             configuration.setCreateDummyComment(ob.dummyDocButton.getSelection());
@@ -108,7 +109,7 @@ public final class PreferenceSerializer {
     private static void fromConfiguration(final OverallConfiguration oc, final OptionsBlock ob,
             final ReplacementBlock rb, final List<PreferenceType> selectedPreferenceTypes) throws Exception {
 
-        if (selectedPreferenceTypes.contains(PreferenceType.OPTIONS) && oc.getConfiguration() != null) {
+        if (selectedPreferenceTypes.contains(PreferenceType.OPTIONS) && (oc.getConfiguration() != null)) {
             final Configuration configuration = oc.getConfiguration();
 
             ob.completeButton.setSelection(configuration.isCompleteExistingJavadoc());
@@ -133,6 +134,7 @@ public final class PreferenceSerializer {
             ob.useFormatterButton.setSelection(configuration.isUseEclipseFormatter());
             ob.getSetFromFieldButton.setSelection(configuration.isGetterSetterFromField());
             ob.includeSubPackagesButton.setSelection(configuration.isIncludeSubPackages());
+            ob.allowMarkedEmptyButton.setSelection(configuration.isAllowMarkedEmpty());
 
             ob.getSetFromFieldFirstButton.setSelection(configuration.isGetterSetterFromFieldFirst());
             ob.getSetFromFieldReplaceButton.setSelection(configuration.isGetterSetterFromFieldReplace());
@@ -144,13 +146,13 @@ public final class PreferenceSerializer {
         }
 
         if (selectedPreferenceTypes.contains(PreferenceType.OPTIONS)
-                && oc.getTagOrder() != null && !oc.getTagOrder().isEmpty()) {
+                && (oc.getTagOrder() != null) && !oc.getTagOrder().isEmpty()) {
             ob.tagOrder = new ArrayList<String>(oc.getTagOrder());
         }
 
         if (selectedPreferenceTypes.contains(PreferenceType.OPTIONS)
-                && oc.getGetSetFromFieldReplacements() != null && !oc.getGetSetFromFieldReplacements().isEmpty()) {
-            ob.getSetFromFieldReplacements =  new TreeSet<GetSetFromFieldReplacement>(oc.getGetSetFromFieldReplacements());
+                && (oc.getGetSetFromFieldReplacements() != null) && !oc.getGetSetFromFieldReplacements().isEmpty()) {
+            ob.getSetFromFieldReplacements = new TreeSet<GetSetFromFieldReplacement>(oc.getGetSetFromFieldReplacements());
         }
 
         if (selectedPreferenceTypes.contains(PreferenceType.HEADERTEXT)
@@ -166,15 +168,15 @@ public final class PreferenceSerializer {
             ob.packageInfoText = oc.getPackageInfoText();
         }
         if (selectedPreferenceTypes.contains(PreferenceType.PROPERTIES)
-                && oc.getProperties() != null && !oc.getProperties().isEmpty()) {
+                && (oc.getProperties() != null) && !oc.getProperties().isEmpty()) {
             ob.properties = new HashMap<String, String>(oc.getProperties());
         }
         if (selectedPreferenceTypes.contains(PreferenceType.REPLACEMENTS)
-                && oc.getReplacements() != null && !oc.getReplacements().isEmpty()) {
+                && (oc.getReplacements() != null) && !oc.getReplacements().isEmpty()) {
             rb.setReplacements(oc.getReplacements().toArray(new Replacement[oc.getReplacements().size()]));
         }
         if (selectedPreferenceTypes.contains(PreferenceType.TEMPLATES)
-                && oc.getTemplates() != null && !oc.getTemplates().isEmpty()) {
+                && (oc.getTemplates() != null) && !oc.getTemplates().isEmpty()) {
             JAutodocPlugin.getContext().getTemplateManager().setTemplates(oc.getTemplates());
         }
     }

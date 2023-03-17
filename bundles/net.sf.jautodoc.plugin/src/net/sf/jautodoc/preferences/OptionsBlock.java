@@ -11,10 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import net.sf.jautodoc.preferences.templates.EditHeaderDialog;
 import net.sf.jautodoc.preferences.templates.EditPackageJavadocDialog;
-
 import org.eclipse.jface.preference.IPreferencePageContainer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -29,7 +27,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
-
 
 /**
  * Creates a composite for JAutodoc options.
@@ -55,6 +52,7 @@ public class OptionsBlock {
     protected Button filterGetterSetterButton;
     protected Button filterExcludeGetterSetterButton;
     protected Button filterExcludeOverridingButton;
+    protected Button allowMarkedEmptyButton;
 
     protected Button todoButton;
     protected Button dummyDocButton;
@@ -84,7 +82,6 @@ public class OptionsBlock {
     protected Map<String, String> properties;
     protected Set<GetSetFromFieldReplacement> getSetFromFieldReplacements;
 
-
     public OptionsBlock() {
         this(null);
     }
@@ -96,7 +93,7 @@ public class OptionsBlock {
     protected Control createContents(Composite parent) {
         basePanel = new Composite(parent, SWT.NONE);
         GridLayout baseLayout = new GridLayout();
-        baseLayout.marginWidth  = 0;
+        baseLayout.marginWidth = 0;
         baseLayout.marginHeight = 0;
         basePanel.setLayout(baseLayout);
         basePanel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -106,8 +103,8 @@ public class OptionsBlock {
         // -----------------------------------
         Composite topComposite = new Composite(basePanel, SWT.NONE);
         GridLayout topLayout = new GridLayout();
-        topLayout.numColumns   = 3;
-        topLayout.marginWidth  = 0;
+        topLayout.numColumns = 3;
+        topLayout.marginWidth = 0;
         topLayout.marginHeight = 0;
         topComposite.setLayout(topLayout);
         topComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -126,8 +123,8 @@ public class OptionsBlock {
         // -----------------------------------
         Composite botComposite = new Composite(basePanel, SWT.NONE);
         GridLayout botLayout = new GridLayout();
-        botLayout.numColumns   = 2;
-        botLayout.marginWidth  = 0;
+        botLayout.numColumns = 2;
+        botLayout.marginWidth = 0;
         botLayout.marginHeight = 0;
         botLayout.makeColumnsEqualWidth = false;
         botComposite.setLayout(botLayout);
@@ -141,7 +138,7 @@ public class OptionsBlock {
         // -> right side
         Composite rightComposite = new Composite(botComposite, SWT.NONE);
         GridLayout rightLayout = new GridLayout(2, false);
-        rightLayout.marginWidth  = 0;
+        rightLayout.marginWidth = 0;
         rightLayout.marginHeight = 0;
         rightComposite.setLayout(rightLayout);
         rightComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -163,7 +160,7 @@ public class OptionsBlock {
     protected void createModeGroup(Composite parent) {
         Group modeGroup = new Group(parent, SWT.NONE);
         GridLayout modeLayout = new GridLayout();
-        modeLayout.marginTop       = 12;
+        modeLayout.marginTop = 12;
         modeLayout.verticalSpacing = 20;
         modeGroup.setLayout(modeLayout);
         modeGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -182,7 +179,7 @@ public class OptionsBlock {
     protected void createVisibilityGroup(Composite parent) {
         Group visibilityGroup = new Group(parent, SWT.NONE);
         GridLayout visibilityLayout = new GridLayout();
-        visibilityLayout.marginTop       = 7;
+        visibilityLayout.marginTop = 7;
         visibilityLayout.verticalSpacing = 15;
         visibilityGroup.setLayout(visibilityLayout);
         visibilityGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -216,6 +213,7 @@ public class OptionsBlock {
         filterMethodsButton = new Button(filterGroup, SWT.CHECK);
         filterMethodsButton.setText(Constants.LABEL_FILTER_METHODS);
         filterMethodsButton.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 updateButtonStates();
             }
@@ -224,6 +222,7 @@ public class OptionsBlock {
         filterGetterSetterButton = new Button(filterGroup, SWT.CHECK);
         filterGetterSetterButton.setText(Constants.LABEL_FILTER_GETSET);
         filterGetterSetterButton.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 if (filterGetterSetterButton.getSelection()) {
                     filterExcludeGetterSetterButton.setSelection(false);
@@ -238,6 +237,7 @@ public class OptionsBlock {
         filterExcludeGetterSetterButton = new Button(filterGroup, SWT.CHECK);
         filterExcludeGetterSetterButton.setText(Constants.LABEL_FILTER_EXCLGETSET);
         filterExcludeGetterSetterButton.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 if (filterExcludeGetterSetterButton.getSelection()) {
                     filterGetterSetterButton.setSelection(false);
@@ -249,20 +249,20 @@ public class OptionsBlock {
         exclGetterGridData.horizontalIndent = 18;
         filterExcludeGetterSetterButton.setLayoutData(exclGetterGridData);
 
-
         filterExcludeOverridingButton = new Button(filterGroup, SWT.CHECK);
         filterExcludeOverridingButton.setText(Constants.LABEL_FILTER_EXCLOVERRID);
 
         GridData exclOverridGridData = new GridData();
         exclOverridGridData.horizontalIndent = 18;
         filterExcludeOverridingButton.setLayoutData(exclOverridGridData);
+
     }
 
     protected void createOptionsGroup(Composite parent) {
         Group optionsGroup = new Group(parent, SWT.NONE);
         optionsGroup.setText(Constants.LABEL_OPTIONS);
         GridLayout optionsLayout = new GridLayout(2, false);
-        optionsLayout.marginTop       = 4;
+        optionsLayout.marginTop = 4;
         optionsLayout.verticalSpacing = 8;
         optionsGroup.setLayout(optionsLayout);
         optionsGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -286,6 +286,7 @@ public class OptionsBlock {
         getSetFromFieldButton = new Button(optionsGroup, SWT.CHECK);
         getSetFromFieldButton.setText(Constants.LABEL_GET_SET_FROM_FIELD);
         getSetFromFieldButton.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 updateButtonStates();
             }
@@ -295,6 +296,7 @@ public class OptionsBlock {
         getSetFromFieldEditButton.setText(Constants.LABEL_GET_SET_FROM_FIELD_EDIT);
         getSetFromFieldEditButton.setLayoutData(new GridData(55, SWT.DEFAULT));
         getSetFromFieldEditButton.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 editGetSetFromFieldPrefix();
             }
@@ -319,6 +321,10 @@ public class OptionsBlock {
         includeSubPackagesButton = new Button(optionsGroup, SWT.CHECK);
         includeSubPackagesButton.setText(Constants.LABEL_INCL_SUBPACKAGES);
         includeSubPackagesButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
+
+        allowMarkedEmptyButton = new Button(optionsGroup, SWT.CHECK);
+        allowMarkedEmptyButton.setText(Constants.LABEL_ALLOW_MARKED_EMPTY);
+        allowMarkedEmptyButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
     }
 
     protected void createHeaderGroup(final Composite parent) {
@@ -336,6 +342,7 @@ public class OptionsBlock {
         addHeaderButton = new Button(headerGroup, SWT.CHECK);
         addHeaderButton.setText(Constants.LABEL_ADD_HEADER);
         addHeaderButton.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(final SelectionEvent event) {
                 updateButtonStates();
             }
@@ -345,6 +352,7 @@ public class OptionsBlock {
         editHeaderButton.setText(Constants.LABEL_EDIT_HEADER);
         editHeaderButton.setLayoutData(new GridData(55, SWT.DEFAULT));
         editHeaderButton.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(final SelectionEvent event) {
                 editHeaderText();
             }
@@ -371,7 +379,7 @@ public class OptionsBlock {
             public void widgetSelected(final SelectionEvent e) {
                 final IPreferencePageContainer ppContainer = preferencePage.getContainer();
                 if (ppContainer instanceof IWorkbenchPreferenceContainer) {
-                    final IWorkbenchPreferenceContainer wpContainer = (IWorkbenchPreferenceContainer)ppContainer;
+                    final IWorkbenchPreferenceContainer wpContainer = (IWorkbenchPreferenceContainer) ppContainer;
                     wpContainer.openPage(getPrefOrPropPageId(e.text, isOnPropertyPage()), null);
                 } else {
                     PreferencesUtil.createPreferenceDialogOn(preferencePage.getShell(),
@@ -391,7 +399,7 @@ public class OptionsBlock {
     }
 
     private boolean isOnPropertyPage() {
-        return preferencePage != null && preferencePage.getElement() != null;
+        return (preferencePage != null) && (preferencePage.getElement() != null);
     }
 
     private String getPrefOrPropPageId(final String linkSelection, final boolean propertyPage) {
@@ -415,6 +423,7 @@ public class OptionsBlock {
         editPackageDocButton.setLayoutData(gridData);
         editPackageDocButton.setText(Constants.LABEL_EDIT_PKGDOC);
         editPackageDocButton.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 editPackageJavadoc();
             }
@@ -442,6 +451,7 @@ public class OptionsBlock {
         editTagOrderButton.setLayoutData(gridData);
         editTagOrderButton.setText(Constants.LABEL_EDIT_TAG_ORDER);
         editTagOrderButton.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(final SelectionEvent event) {
                 editTagOrder();
             }
@@ -456,6 +466,7 @@ public class OptionsBlock {
         filterGetterSetterButton.setEnabled(filterMethodsButton.getSelection());
         filterExcludeGetterSetterButton.setEnabled(filterMethodsButton.getSelection());
         filterExcludeOverridingButton.setEnabled(filterMethodsButton.getSelection());
+        allowMarkedEmptyButton.setEnabled(filterMethodsButton.getSelection());
 
         getSetFromFieldEditButton.setEnabled(getSetFromFieldButton.getSelection());
         getSetFromFieldFirstButton.setEnabled(getSetFromFieldButton.getSelection());
@@ -476,8 +487,7 @@ public class OptionsBlock {
         if (packageDialog.open() == Window.OK) {
             if (usePackageInfoButton.getSelection()) {
                 packageInfoText = packageDialog.getText();
-            }
-            else {
+            } else {
                 packageDocText = packageDialog.getText();
             }
         }
