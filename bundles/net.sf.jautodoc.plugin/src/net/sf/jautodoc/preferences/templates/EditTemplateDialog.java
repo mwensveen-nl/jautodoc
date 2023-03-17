@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import net.sf.jautodoc.IApplicationContext;
 import net.sf.jautodoc.JAutodocPlugin;
 import net.sf.jautodoc.ResourceManager;
@@ -38,7 +37,6 @@ import net.sf.jautodoc.templates.rules.TemplateCodeScanner;
 import net.sf.jautodoc.templates.viewer.TemplateViewerConfiguration;
 import net.sf.jautodoc.utils.StringUtils;
 import net.sf.jautodoc.utils.Utils;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.ToolFactory;
 import org.eclipse.jdt.core.compiler.IScanner;
@@ -72,7 +70,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-
 /**
  * Dialog for editing Javadoc templates.
  */
@@ -90,7 +87,6 @@ public class EditTemplateDialog extends TitleAreaDialog implements
     private ITemplateManager templateManager;
 
     private LogEntry logEntry;
-
 
     /**
      * Instantiates a new edit template dialog.
@@ -113,9 +109,12 @@ public class EditTemplateDialog extends TitleAreaDialog implements
         TemplateEngineLogger.addLogListener(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
      */
+    @Override
     protected Control createDialogArea(Composite parent) {
         view = new EditTemplatePanel(parent, SWT.NONE);
 
@@ -131,9 +130,12 @@ public class EditTemplateDialog extends TitleAreaDialog implements
         return view;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.dialogs.Dialog#okPressed()
      */
+    @Override
     protected void okPressed() {
         if (validate(false) != null) {
             commitData();
@@ -148,10 +150,10 @@ public class EditTemplateDialog extends TitleAreaDialog implements
         IApplicationContext ctx = JAutodocPlugin.getContext();
 
         // edit template viewer
-        ITextHover editTextHover                 = ctx.getTemplateTextHover(properties);
-        IRulesStrategy[] editRuleStrategies     = ctx.getTemplateRuleStrategies();
-        IAutoEditStrategy[] autoEditStrategies     = ctx.getTemplateAutoEditStrategies();
-        ITemplateContentAssistant[] assistants     = ctx.getTemplateContentAssistants(properties);
+        ITextHover editTextHover = ctx.getTemplateTextHover(properties);
+        IRulesStrategy[] editRuleStrategies = ctx.getTemplateRuleStrategies();
+        IAutoEditStrategy[] autoEditStrategies = ctx.getTemplateAutoEditStrategies();
+        ITemplateContentAssistant[] assistants = ctx.getTemplateContentAssistants(properties);
 
         SourceViewerConfiguration configuration = new TemplateViewerConfiguration(
                 new TemplateCodeScanner(editRuleStrategies),
@@ -161,8 +163,8 @@ public class EditTemplateDialog extends TitleAreaDialog implements
         view.templateViewer.configure(configuration);
 
         // preview template viewer (read only -> no content assists)
-        ITextHover         previewTextHover        = ctx.getTemplateTextHover(properties);
-        IRulesStrategy[] previewRuleStrategies    = ctx.getTemplatePreviewRuleStrategies(this);
+        ITextHover previewTextHover = ctx.getTemplateTextHover(properties);
+        IRulesStrategy[] previewRuleStrategies = ctx.getTemplatePreviewRuleStrategies(this);
 
         configuration = new TemplateViewerConfiguration(
                 new TemplateCodeScanner(previewRuleStrategies),
@@ -177,6 +179,7 @@ public class EditTemplateDialog extends TitleAreaDialog implements
         view.textExample.setText(StringUtils.checkNull(entry.getExample()));
         view.radioElementName.setSelection(!entry.isUseSignature());
         view.radioSignature.setSelection(entry.isUseSignature());
+        view.selectEmpty.setSelection(entry.isAllowEmpty());
 
         if (entry.isDefaultTemplate()) {
             view.textName.setEditable(false);
@@ -187,17 +190,14 @@ public class EditTemplateDialog extends TitleAreaDialog implements
         String text = StringUtils.checkNull(entry.getText());
         if (text.length() == 0) {
             if (entry.isParameter()) {
-                document= new Document(Constants.EMPTY_PARAMDOC);
+                document = new Document(Constants.EMPTY_PARAMDOC);
+            } else if (entry.isException()) {
+                document = new Document(Constants.EMPTY_THROWSDOC);
+            } else {
+                document = new Document(Constants.EMPTY_JAVADOC);
             }
-            else if (entry.isException()) {
-                document= new Document(Constants.EMPTY_THROWSDOC);
-            }
-            else {
-                document= new Document(Constants.EMPTY_JAVADOC);
-            }
-        }
-        else {
-            document= new Document(text);
+        } else {
+            document = new Document(text);
         }
         view.templateViewer.setDocument(document);
 
@@ -211,8 +211,7 @@ public class EditTemplateDialog extends TitleAreaDialog implements
             view.textParentName.setText(StringUtils.getLastElement(parent.getName(), '.'));
             view.textParentRegex.setText(parent.getRegex());
             view.textParentExample.setText(parent.getExample());
-        }
-        else {
+        } else {
             view.textParentName.setText("");
             view.textParentRegex.setText("");
             view.textParentExample.setText("");
@@ -221,12 +220,14 @@ public class EditTemplateDialog extends TitleAreaDialog implements
 
     private void initListener() {
         view.buttonPreview.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 showPreview();
             }
         });
 
         view.tabFolder.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 if (view.tabFolder.getSelectionIndex() == 1) {
                     showPreview();
@@ -235,8 +236,9 @@ public class EditTemplateDialog extends TitleAreaDialog implements
         });
 
         VerifyListener verifyListener = new VerifyListener() {
+            @Override
             public void verifyText(VerifyEvent e) {
-                if (e.getSource() == view.textName && e.character == '.') {
+                if ((e.getSource() == view.textName) && (e.character == '.')) {
                     setInfo("Please don't use dots for the name.");
                     e.doit = false;
                     return;
@@ -251,28 +253,32 @@ public class EditTemplateDialog extends TitleAreaDialog implements
         view.textExample.addVerifyListener(verifyListener);
 
         view.templateViewer.prependVerifyKeyListener(new VerifyKeyListener() {
+            @Override
             public void verifyKey(VerifyEvent event) {
                 verifyTemplateViewerKeyPressed(event);
             }
         });
 
         view.previewViewer.prependVerifyKeyListener(new VerifyKeyListener() {
+            @Override
             public void verifyKey(VerifyEvent e) {
-                if (!e.doit) return;
+                if (!e.doit) {
+                    return;
+                }
 
-                if (e.stateMask == SWT.MOD1 && e.character == 't' - 'a' + 1) {
+                if ((e.stateMask == SWT.MOD1) && (e.character == (('t' - 'a') + 1))) {
                     view.tabFolder.setSelection(0);
                     view.templateViewer.getControl().forceFocus();
                     e.doit = false;
                     return;
-                }
-                else if (e.keyCode != SWT.MOD1) {
+                } else if (e.keyCode != SWT.MOD1) {
                     setInfo("Please change to the Template tab for editing.");
                 }
             }
         });
 
         view.getShell().addShellListener(new ShellAdapter() {
+            @Override
             public void shellClosed(ShellEvent e) {
                 TemplateEngineLogger.removeLogListener(EditTemplateDialog.this);
             }
@@ -293,14 +299,17 @@ public class EditTemplateDialog extends TitleAreaDialog implements
     }
 
     private void verifyTemplateViewerKeyPressed(VerifyEvent event) {
-        if (!event.doit) return;
+        if (!event.doit) {
+            return;
+        }
 
         // clear messages
         setOK();
 
         // CTRL pressed?
-        if (event.stateMask != SWT.MOD1)
+        if (event.stateMask != SWT.MOD1) {
             return;
+        }
 
         switch (event.character) {
             // CTRL-Space
@@ -310,15 +319,15 @@ public class EditTemplateDialog extends TitleAreaDialog implements
                 break;
 
             // CTRL-Z
-            case 'z' - 'a' + 1:
+            case ('z' - 'a') + 1:
                 view.templateViewer.doOperation(ITextOperationTarget.UNDO);
-                event.doit= false;
+                event.doit = false;
                 break;
 
             // CTRL-Y
-            case 'y' - 'a' + 1:
+            case ('y' - 'a') + 1:
                 view.templateViewer.doOperation(ITextOperationTarget.REDO);
-                event.doit= false;
+                event.doit = false;
                 break;
         }
     }
@@ -329,6 +338,7 @@ public class EditTemplateDialog extends TitleAreaDialog implements
         entry.setExample(view.textExample.getText().trim());
         entry.setText(view.templateViewer.getTextWidget().getText().trim());
         entry.setUseSignature(view.radioSignature.getSelection());
+        entry.setAllowEmpty(view.selectEmpty.getSelection());
         templateManager.putTemplate(entry);
     }
 
@@ -342,7 +352,9 @@ public class EditTemplateDialog extends TitleAreaDialog implements
 
     private void showPreview() {
         String templateText = validate(true);
-        if (templateText == null) return;
+        if (templateText == null) {
+            return;
+        }
 
         fireTemplateResultChangeEvent();
         setPreviewGroupsText(matcher, parentMatcher);
@@ -363,8 +375,7 @@ public class EditTemplateDialog extends TitleAreaDialog implements
             if (logEntry != null) {
                 if (logEntry.getSeverity() != IStatus.ERROR) {
                     setInfo(logEntry.getMessage());
-                }
-                else {
+                } else {
                     setError(logEntry.getMessage());
                 }
 
@@ -397,22 +408,24 @@ public class EditTemplateDialog extends TitleAreaDialog implements
     }
 
     private String validate(boolean preview) {
-        if (!preview && !validateText(view.textName,
-                            "Please insert a name for the template.", true)        ||
-            !validateText(view.textRegex,
-                            "Please insert a valid regular expression.", true) ||
-            !validateText(view.textExample,
-                            "Please insert an example that matches the regular expression.", true)    ||
-            !validateText(view.templateViewer.getTextWidget(),
-                            "Please insert a text for the template.", true)) {
+        if ((!preview && !validateText(view.textName,
+                "Please insert a name for the template.", true)) ||
+                !validateText(view.textRegex,
+                        "Please insert a valid regular expression.", true)
+                ||
+                !validateText(view.textExample,
+                        "Please insert an example that matches the regular expression.", true)
+                ||
+                !validateText(view.templateViewer.getTextWidget(),
+                        "Please insert a text for the template.", true)) {
             return null;
         }
 
-        if (!validatePattern() || !validateTemplate() || !preview && !validateName()) {
+        if (!validatePattern() || !validateTemplate() || (!preview && !validateName())) {
             return null;
         }
 
-        matcher       = pattern.matcher(view.textExample.getText());
+        matcher = pattern.matcher(view.textExample.getText());
         parentMatcher = entry.getParent() != null ? getParentMatcher() : null;
 
         if (!matcher.matches()) {
@@ -443,7 +456,8 @@ public class EditTemplateDialog extends TitleAreaDialog implements
                     return true;
                 }
             }
-        } catch (InvalidInputException e) {/* ignore */}
+        } catch (InvalidInputException e) {
+            /* ignore */}
 
         setError("Please insert a valid Javadoc comment.");
         return false;
@@ -459,8 +473,11 @@ public class EditTemplateDialog extends TitleAreaDialog implements
 
     private boolean validateText(Control control, String text, String message, boolean error) {
         if (text.trim().length() == 0) {
-            if (!error)    setInfo(message);
-            else         setError(message);
+            if (!error) {
+                setInfo(message);
+            } else {
+                setError(message);
+            }
 
             control.forceFocus();
             return false;
@@ -479,13 +496,12 @@ public class EditTemplateDialog extends TitleAreaDialog implements
         templateName = entry.getParent() == null ? "" : entry.getParent().getName() + ".";
         templateName += entry.getDescription() + "." + view.textName.getText().trim();
 
-        if ((entry.getName() == null || !entry.getName().equals(templateName)) &&
+        if (((entry.getName() == null) || !entry.getName().equals(templateName)) &&
                 templateManager.existsTemplate(templateName)) {
             setError("A template with this name already exists.");
             view.textName.forceFocus();
             return false;
-        }
-        else {
+        } else {
             setOK();
             return true;
         }
@@ -550,7 +566,7 @@ public class EditTemplateDialog extends TitleAreaDialog implements
         buffer.append(Constants.TEMPLATES_DLG_HEADING_GROUPS + Constants.LINE_SEPARATOR);
         TextAttribute ta = ResourceManager.getTextAttribute(ResourceManager.HEADING);
         ranges.add(new StyleRange(0, buffer.length(),
-                ta.getForeground(),    ta.getBackground(), ta.getStyle()));
+                ta.getForeground(), ta.getBackground(), ta.getStyle()));
         createPreviewGroupsText(matcher, buffer, ranges);
 
         if (parentMatcher != null) {
@@ -558,7 +574,7 @@ public class EditTemplateDialog extends TitleAreaDialog implements
             buffer.append(Constants.LINE_SEPARATOR +
                     Constants.TEMPLATES_DLG_HEADING_PARENTGROUPS + Constants.LINE_SEPARATOR);
             ranges.add(new StyleRange(startIndex, buffer.length() - startIndex,
-                    ta.getForeground(),    ta.getBackground(), ta.getStyle()));
+                    ta.getForeground(), ta.getBackground(), ta.getStyle()));
             createPreviewGroupsText(parentMatcher, buffer, ranges);
         }
 
@@ -573,12 +589,12 @@ public class EditTemplateDialog extends TitleAreaDialog implements
             buffer.append(Constants.TEMPLATES_DLG_NOMATCH + Constants.LINE_SEPARATOR);
             TextAttribute ta = ResourceManager.getTextAttribute(ResourceManager.NOMATCH);
             ranges.add(new StyleRange(startIndex, buffer.length() - startIndex,
-                    ta.getForeground(),    ta.getBackground(), ta.getStyle()));
+                    ta.getForeground(), ta.getBackground(), ta.getStyle()));
             return;
         }
 
         TextAttribute taNormal = ResourceManager.getTextAttribute(ResourceManager.NORMAL);
-        TextAttribute taGroup  = ResourceManager.getTextAttribute(ResourceManager.GROUP);
+        TextAttribute taGroup = ResourceManager.getTextAttribute(ResourceManager.GROUP);
 
         for (int i = 0; i <= matcher.groupCount(); ++i) {
             buffer.append("" + i + ": ");
@@ -592,11 +608,14 @@ public class EditTemplateDialog extends TitleAreaDialog implements
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see net.sf.jautodoc.templates.replacements.ITemplateReplacementsProvider#getReplacements()
      */
+    @Override
     public Collection<String> getReplacements() {
-        if (matcher == null || !matcher.matches()) {
+        if ((matcher == null) || !matcher.matches()) {
             return new TreeMap<Integer, String>().values();
         }
 
@@ -609,7 +628,7 @@ public class EditTemplateDialog extends TitleAreaDialog implements
             }
         }
 
-        if (parentMatcher == null || !parentMatcher.matches()) {
+        if ((parentMatcher == null) || !parentMatcher.matches()) {
             return map.values();
         }
 
@@ -624,9 +643,13 @@ public class EditTemplateDialog extends TitleAreaDialog implements
         return map.values();
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.jautodoc.templates.replacements.ITemplateReplacementsProvider#addTemplateReplacementsListener(net.sf.jautodoc.templates.replacements.ITemplateReplacementsListener)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see net.sf.jautodoc.templates.replacements.ITemplateReplacementsProvider#addTemplateReplacementsListener(net.sf.jautodoc.templates.replacements.
+     * ITemplateReplacementsListener)
      */
+    @Override
     public void addTemplateReplacementsListener(ITemplateReplacementsListener listener) {
         resultListener.add(listener);
     }
@@ -642,22 +665,29 @@ public class EditTemplateDialog extends TitleAreaDialog implements
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see net.sf.jautodoc.templates.LogListener#messageLogged(net.sf.jautodoc.templates.LogEntry)
      */
+    @Override
     public void messageLogged(LogEntry logEntry) {
         this.logEntry = logEntry;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.eclipse.jface.dialogs.Dialog#getDialogBoundsSettings()
      */
+    @Override
     protected IDialogSettings getDialogBoundsSettings() {
-        String sectionName= getClass().getName() + "_dialogBounds"; //$NON-NLS-1$
-        IDialogSettings settings= JAutodocPlugin.getDefault().getDialogSettings();
-        IDialogSettings section= settings.getSection(sectionName);
-        if (section == null)
-            section= settings.addNewSection(sectionName);
+        String sectionName = getClass().getName() + "_dialogBounds"; //$NON-NLS-1$
+        IDialogSettings settings = JAutodocPlugin.getDefault().getDialogSettings();
+        IDialogSettings section = settings.getSection(sectionName);
+        if (section == null) {
+            section = settings.addNewSection(sectionName);
+        }
         return section;
     }
 
@@ -667,25 +697,29 @@ public class EditTemplateDialog extends TitleAreaDialog implements
 
     private class ShortcutListener implements KeyListener, VerifyKeyListener {
 
+        @Override
         public void keyPressed(KeyEvent e) {
             handleKeyEvent(e);
         }
 
+        @Override
         public void keyReleased(KeyEvent e) {
         }
 
+        @Override
         public void verifyKey(VerifyEvent e) {
             handleKeyEvent(e);
         }
 
         private void handleKeyEvent(KeyEvent e) {
-            if (e.stateMask != SWT.MOD1) return;
+            if (e.stateMask != SWT.MOD1) {
+                return;
+            }
 
-            if (e.character == 's' - 'a' + 1) {
+            if (e.character == (('s' - 'a') + 1)) {
                 showPreview(); // CTRL-S (also Preview)
                 e.doit = false;
-            }
-            else if (e.character == 'p' - 'a' + 1) {
+            } else if (e.character == (('p' - 'a') + 1)) {
                 showPreview(); // CTRL-P
                 e.doit = false;
             }
