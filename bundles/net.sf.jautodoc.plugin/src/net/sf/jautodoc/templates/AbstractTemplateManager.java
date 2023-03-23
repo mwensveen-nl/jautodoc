@@ -13,9 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import net.sf.jautodoc.JAutodocPlugin;
+import net.sf.jautodoc.preferences.Constants;
 import net.sf.jautodoc.templates.wrapper.IMemberWrapper;
 import net.sf.jautodoc.templates.wrapper.WrapperFactory;
 import org.apache.velocity.runtime.parser.ParseException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
@@ -226,10 +228,17 @@ public abstract class AbstractTemplateManager implements ITemplateManager {
     private String applyTemplate(IMemberWrapper member, Map<String, String> properties) throws Exception {
         MatchingElement me = searchMatchingElement(member);
         if (me != null) {
-            return applyTemplate(me, properties);
+            Platform.getLog(getClass()).info("*************************** " + me.getEntry().isAllowEmpty());
+            Platform.getLog(getClass()).info("*************************** " + properties);
+            if (me.getEntry().isAllowEmpty() && Boolean.valueOf(properties.get(Constants.ALLOW_MARKED_EMPTY))) {
+                return "";
+            } else {
+                return applyTemplate(me, properties);
+            }
         }
 
         return "";
+
     }
 
     /**
@@ -283,7 +292,7 @@ public abstract class AbstractTemplateManager implements ITemplateManager {
      *
      * @throws Exception thrown if an exception occured
      */
-    private MatchingElement searchMatchingElement(IMemberWrapper member) throws Exception {
+    public MatchingElement searchMatchingElement(IMemberWrapper member) throws Exception {
         ensureMatchingParent(member);
 
         List<TemplateEntry> templates = null;

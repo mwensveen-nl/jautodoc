@@ -203,7 +203,7 @@ public class EditTemplatePanel extends Composite {
         compositeTemplate.setLayout(new GridLayout());
 
         selectEmpty = new Button(this, SWT.CHECK);
-        selectEmpty.setText("Can leave empty");
+        selectEmpty.setText("Empty javadoc allowed");
         selectEmpty.setLayoutData(gridData3);
 
         createTabFolder();

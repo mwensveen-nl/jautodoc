@@ -9,15 +9,15 @@ package net.sf.jautodoc.source;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import net.sf.jautodoc.JAutodocPlugin;
 import net.sf.jautodoc.preferences.Configuration;
 import net.sf.jautodoc.preferences.Constants;
+import net.sf.jautodoc.templates.MatchingElement;
+import net.sf.jautodoc.templates.wrapper.WrapperFactory;
 import net.sf.jautodoc.utils.LineDelimiterConverter;
 import net.sf.jautodoc.utils.SourceUtils;
 import net.sf.jautodoc.utils.TextEditHelper;
 import net.sf.jautodoc.utils.Utils;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
@@ -31,7 +31,6 @@ import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
-
 
 /**
  * Class for source code manipulation.
@@ -61,7 +60,7 @@ public class SourceManipulator extends AbstractSourceProcessor {
      * @param compUnit the compilation unit
      * @param config the configuration to use
      */
-    public SourceManipulator(ICompilationUnit compUnit, Configuration  config) {
+    public SourceManipulator(ICompilationUnit compUnit, Configuration config) {
         super(compUnit, config);
     }
 
@@ -92,7 +91,7 @@ public class SourceManipulator extends AbstractSourceProcessor {
      * @param cursorPosition the current cursor position
      */
     public void setCursorPosition(int cursorPosition) {
-        this.cursorOffset   = 0;
+        this.cursorOffset = 0;
         this.cursorPosition = cursorPosition;
     }
 
@@ -141,7 +140,7 @@ public class SourceManipulator extends AbstractSourceProcessor {
 
     @Override
     protected void processTodoForAutodoc(final IMember[] members) throws Exception {
-        if (config.isAddTodoForAutodoc() && members.length > 1) {
+        if (config.isAddTodoForAutodoc() && (members.length > 1)) {
             addTodoForAutoDoc();
         }
     }
@@ -171,7 +170,7 @@ public class SourceManipulator extends AbstractSourceProcessor {
 
         // parse existing javadoc
         String existingJavadoc = "";
-        if (docRange.getLength() > 0
+        if ((docRange.getLength() > 0)
                 && (config.isKeepExistingJavadoc() || config.isCompleteExistingJavadoc())
                 && (!config.isGetterSetterFromField() || !config.isGetterSetterFromFieldReplace()
                         || !SourceUtils.isGetterSetter(member))) {
@@ -188,25 +187,26 @@ public class SourceManipulator extends AbstractSourceProcessor {
 
         final String indent = SourceUtils.getIndentionString(document, member);
 
+        MatchingElement matchingElement = JAutodocPlugin.getContext().getTemplateManager().searchMatchingElement(WrapperFactory.getWrapper(member));
+        if ((matchingElement != null) && matchingElement.getEntry().isAllowEmpty() && config.isAllowMarkedEmpty()) {
+            return;
+        }
         if (member instanceof IType) {
             if (config.isCreateDummyComment()) {
                 jdi = javadocCreator.applyTemplate(member, jdi);
             }
-            newJavadoc = javadocCreator.createJavadoc((IType)member, indent, lineDelimiter, jdi);
-        }
-        else if (member instanceof IField) {
+            newJavadoc = javadocCreator.createJavadoc((IType) member, indent, lineDelimiter, jdi);
+        } else if (member instanceof IField) {
             if (config.isCreateDummyComment()) {
                 jdi = javadocCreator.applyTemplate(member, jdi);
             }
-            newJavadoc = javadocCreator.createJavadoc((IField)member, indent, lineDelimiter, jdi);
-        }
-        else if (member instanceof IMethod) {
+            newJavadoc = javadocCreator.createJavadoc((IField) member, indent, lineDelimiter, jdi);
+        } else if (member instanceof IMethod) {
             // check for inherited doc
             if (jdi.isEmpty()) { // keep existing
-                newJavadoc = SourceUtils.getInheritedJavadoc((IMethod)member, indent, lineDelimiter);
-                inherited = (newJavadoc != null && newJavadoc.length() > 0);
-            }
-            else if (jdi.isInheritDoc()) {
+                newJavadoc = SourceUtils.getInheritedJavadoc((IMethod) member, indent, lineDelimiter);
+                inherited = ((newJavadoc != null) && (newJavadoc.length() > 0));
+            } else if (jdi.isInheritDoc()) {
                 return; // nothing to do
             }
 
@@ -216,7 +216,7 @@ public class SourceManipulator extends AbstractSourceProcessor {
                             jdi, document, commentScanner);
                 }
 
-                if (newJavadoc == null || newJavadoc.length() == 0) {
+                if ((newJavadoc == null) || (newJavadoc.length() == 0)) {
                     if (config.isCreateDummyComment()) {
                         jdi = javadocCreator.applyTemplate(member, jdi);
                     }
@@ -238,7 +238,7 @@ public class SourceManipulator extends AbstractSourceProcessor {
 
         // add empty line in front
         if (Utils.needsLeadingEmptyLine(document, member, docRange)) {
-            newJavadoc  = lineDelimiter + indent + newJavadoc;
+            newJavadoc = lineDelimiter + indent + newJavadoc;
         }
 
         // for new javadoc add new line
@@ -247,10 +247,11 @@ public class SourceManipulator extends AbstractSourceProcessor {
         }
 
         // add to buffer
-        if ((docRange.getLength() == 0 || !config.isKeepExistingJavadoc()) &&
+        if (((docRange.getLength() == 0) || !config.isKeepExistingJavadoc()) &&
                 Utils.needsReplacement(document, member, docRange, newJavadoc, inherited)) {
-            doReplacement(docRange, newJavadoc, (docRange.getLength() == 0 ? "Add Javadoc" : (config
-                    .isCompleteExistingJavadoc() ? "Complete existing Javadoc" : "Replace existing Javadoc")));
+            doReplacement(docRange, newJavadoc, (docRange.getLength() == 0 ? "Add Javadoc"
+                    : (config
+                            .isCompleteExistingJavadoc() ? "Complete existing Javadoc" : "Replace existing Javadoc")));
         }
     }
 
@@ -268,7 +269,7 @@ public class SourceManipulator extends AbstractSourceProcessor {
         final ISourceRange range = element.getSourceRange();
         final ISourceRange commentRange = SourceUtils.findCommentSourceRange(document, 0, range.getOffset()
                 + range.getLength(), commentScanner, !config.isMultiCommentHeader());
-        if (commentRange.getLength() > 0 && !config.isReplaceHeader()) {
+        if ((commentRange.getLength() > 0) && !config.isReplaceHeader()) {
             return;
         }
 
